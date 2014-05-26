@@ -1,4 +1,20 @@
+# For Rails 4.1 +
+
+## 0.4.1
+
+* ActiveRecord `table_name_prefix` support; #31
+
+## 0.4.0
+
+* Rails 4.1.0 compatibility.
+* Setting.all -> Setting.get_all
+
 # For Rails 4.0 +
+
+## 0.3.2
+
+* Enable destroy-ing a key with falsy data; #32
+* Require Rails 4.0.0+;
 
 ## 0.3.1
 
@@ -7,8 +23,6 @@
 ## 0.3.0
 
 * Fix to work with Rails 4.0.0
-
-
 
 # For Rails 3.x
 

@@ -9,13 +9,16 @@ arrays, or any object. Ported to Rails 3!
 
 ## Status
 
-[![CI Status](https://secure.travis-ci.org/huacnlee/rails-settings-cached.png)](http://travis-ci.org/huacnlee/rails-settings-cached)
+- [![Gem Version](https://badge.fury.io/rb/rails-settings-cached.png)](https://rubygems.org/gems/rails-settings-cached)
+- [![CI Status](https://api.travis-ci.org/huacnlee/rails-settings-cached.png)](http://travis-ci.org/huacnlee/rails-settings-cached)
 
 ## Setup
 
 Edit your Gemfile:
 
 ```ruby
+# Rails 4.1.x
+gem "rails-settings-cached", "0.4.1"
 # Rails 4+
 gem "rails-settings-cached", "0.3.1"
 # Rails 3.x
@@ -37,7 +40,7 @@ end
 ```
 
 Now just put that migration in the database with:
-    
+
 ```bash
 rake db:migrate
 ```
@@ -83,17 +86,17 @@ Setting.foo            # returns nil
 Want a list of all the settings?
 
 ```ruby
-Setting.all    
-# returns {'admin_password' => 'super_secret', 'date_format' => '%m %d, %Y'}        
+Setting.get_all
+# returns {'admin_password' => 'super_secret', 'date_format' => '%m %d, %Y'}
 ```
 
-You need name spaces and want a list of settings for a give name space? Just choose your prefered named space delimiter and use Setting.all like this:
+You need name spaces and want a list of settings for a give name space? Just choose your prefered named space delimiter and use Setting.get_all like this:
 
 ```ruby
 Setting['preferences.color'] = :blue
 Setting['preferences.size'] = :large
 Setting['license.key'] = 'ABC-DEF'
-Setting.all('preferences.')   
+Setting.get_all('preferences.')
 # returns { 'preferences.color' => :blue, 'preferences.size' => :large }
 ```
 
@@ -105,7 +108,7 @@ with the following:
 Setting.defaults[:some_setting] = 'footastic'
 Setting.where(:var => "some_setting").count
 => 0
-Setting.some_setting   
+Setting.some_setting
 => "footastic"
 ```
 
@@ -115,18 +118,16 @@ Init defualt value in database, this has indifferent with `Setting.defaults[:som
 Setting.save_default(:some_key, "123")
 Setting.where(:var => "some_key").count
 => 1
-Setting.some_key 
+Setting.some_key
 => "123"
 ```
-  
-
 
 Settings may be bound to any existing ActiveRecord object. Define this association like this:
 Notice! is not do caching in this version.
-  
+
 ```ruby
 class User < ActiveRecord::Base
-  include RailsSettings::Extend 
+  include RailsSettings::Extend
 end
 ```
 
@@ -136,23 +137,43 @@ Then you can set/get a setting for a given user instance just by doing this:
 user = User.find(123)
 user.settings.color = :red
 user.settings.color # returns :red
-user.settings.all # { "color" => :red }
+user.settings.get_all # { "color" => :red }
 ```
 
 I you want to find users having or not having some settings, there are named scopes for this:
 
 ```ruby
-User.with_settings 
+User.with_settings
 # => returns a scope of users having any setting
 
-User.with_settings_for('color') 
+User.with_settings_for('color')
 # => returns a scope of users having a 'color' setting
 
-User.without_settings 
-# returns a scope of users having no setting at all (means user.settings.all == {})
+User.without_settings
+# returns a scope of users having no setting at all (means user.settings.get_all == {})
 
-User.without_settings('color') 
+User.without_settings('color')
 # returns a scope of users having no 'color' setting (means user.settings.color == nil)
 ```
+
+-----
+
+## How to create a list, form to manage Settings?
+
+If you want create an admin interface to editing the Settings, you can try methods in follow:
+
+```ruby
+class SettingsController < ApplicationController
+  def index
+    # to get all items for render list
+    @settings = Setting.unscoped
+  end
+  
+  def edit
+    @setting = Setting.unscoped.find(params[:id])
+  end
+end
+```
+
 
 That's all there is to it! Enjoy!

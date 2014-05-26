@@ -1,7 +1,7 @@
 module RailsSettings
   class Settings < ActiveRecord::Base
 
-    self.table_name = 'settings'
+    self.table_name = table_name_prefix + 'settings'
 
     class SettingNotFound < RuntimeError; end
 
@@ -32,8 +32,9 @@ module RailsSettings
     #destroy the specified settings record
     def self.destroy(var_name)
       var_name = var_name.to_s
-      if self[var_name]
-        object(var_name).destroy
+      obj = object(var_name)
+      unless obj.nil?
+        obj.destroy
         true
       else
         raise SettingNotFound, "Setting variable \"#{var_name}\" not found"
@@ -41,7 +42,7 @@ module RailsSettings
     end
 
     #retrieve all settings as a hash (optionally starting with a given namespace)
-    def self.all(starting_with = nil)
+    def self.get_all(starting_with = nil)
       vars = thing_scoped.select("var,value")
       if starting_with
         vars = vars.where("var LIKE '#{starting_with}%'")
